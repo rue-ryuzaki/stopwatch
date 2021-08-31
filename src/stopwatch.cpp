@@ -8,40 +8,41 @@
 // -----------------------------------------------------------------------------
 std::string Stopwatch::time_to_string(double seconds)
 {
-    std::string result = time_to_string(uint64_t(seconds));
+    std::string res = time_to_string(uint64_t(seconds));
     double fraction = seconds - double(uint64_t(seconds));
     std::string str = std::to_string(fraction);
     if (str.size() > 2) {
-        result.insert(result.size() - 1, str.substr(1, std::min(size_t(4), str.size() - 1)));
+        res.insert(res.size() - 1, str.substr(1, std::min(size_t(4), str.size() - 1)));
     }
-    return result;
+    return res;
 }
 
 // -----------------------------------------------------------------------------
 std::string Stopwatch::time_to_string(uint64_t seconds)
 {
-    static std::vector<std::pair<uint64_t, std::string> > timestamps =
+    std::vector<std::pair<uint64_t, std::string> > const timestamps =
     {
         { 60, "s" },
         { 60, "m" },
         { 24, "h" },
         {  7, "d" }
     };
-    std::string result;
+    std::string res;
     for (auto const& pair : timestamps) {
         uint64_t modulo = seconds % pair.first;
         seconds /= pair.first;
         if (seconds == 0) {
-            result = std::to_string(modulo) + pair.second + result;
+            res = std::to_string(modulo) + pair.second + res;
             break;
         } else {
-            result = (modulo < 10 ? ("0" + std::to_string(modulo)) : std::to_string(modulo)) + pair.second + result;
+            res = (modulo < 10 ? ("0" + std::to_string(modulo))
+                               : std::to_string(modulo)) + pair.second + res;
         }
     }
     if (seconds > 0) {
-        result = std::to_string(seconds) + "w" + result;
+        res = std::to_string(seconds) + "w" + res;
     }
-    return result;
+    return res;
 }
 
 // -----------------------------------------------------------------------------
@@ -79,7 +80,8 @@ uint64_t Stopwatch::remain(double percent) const
 // -----------------------------------------------------------------------------
 bool Stopwatch::is_elapsed(uint64_t sec) const
 {
-    return std::chrono::duration<uint64_t, std::nano>(current() - m_last).count() / std::nano::den >= sec;
+    return std::chrono::duration<uint64_t, std::nano>(current() - m_last).count()
+            / std::nano::den >= sec;
 }
 
 // -----------------------------------------------------------------------------
